@@ -5,9 +5,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from "../styles/Home.module.css";
 import { supabase } from "../lib/supabaseClient";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { v4 } from "uuid";
-import { Button, Flex, FormControl, Input } from "@chakra-ui/react";
+import { Button, Flex, Input } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
 const Login: NextPage = () => {
   const [loading, setLoading] = useState(false);
@@ -15,9 +14,10 @@ const Login: NextPage = () => {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
+
+  const router = useRouter();
 
   const handleLogin = async (data: any) => {
     try {
@@ -28,6 +28,7 @@ const Login: NextPage = () => {
       });
       if (error) throw error;
       alert("Check your email for the login link!");
+      router.push("/profile");
     } catch (error) {
       alert(error);
     } finally {
