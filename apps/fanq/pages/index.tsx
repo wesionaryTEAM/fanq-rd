@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from '../styles/Home.module.css';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 
 const Home: NextPage = () => {
   const [uploading, setUploading] = useState(false);
