@@ -1,14 +1,13 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import styles from "../styles/Home.module.css";
-import { supabase } from "../lib/supabaseClient";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { v4 } from "uuid";
-import { Button, Flex, FormControl, Input, Text } from "@chakra-ui/react";
-import Link from "next/link";
+import { gql, useQuery } from '@apollo/client';
+import { Button, Flex, Input, Text } from '@chakra-ui/react';
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { supabase } from '../lib/supabaseClient';
+import styles from '../styles/Home.module.css';
 
 const GET_USERS_QUERY = gql`
   query Users {
@@ -23,18 +22,18 @@ const GET_USERS_QUERY = gql`
   }
 `;
 
-const CREATE_USER = gql`
-  mutation ($object: users_insert_input!) {
-    insert_users_one(object: $object) {
-      first_name
-      id
-      last_name
-      password
-      profile
-      username
-    }
-  }
-`;
+// const CREATE_USER = gql`
+//   mutation ($object: users_insert_input!) {
+//     insert_users_one(object: $object) {
+//       first_name
+//       id
+//       last_name
+//       password
+//       profile
+//       username
+//     }
+//   }
+// `;
 
 const Home: NextPage = () => {
   const [uploading, setUploading] = useState(false);
@@ -48,21 +47,21 @@ const Home: NextPage = () => {
 
   const { loading, error, data } = useQuery(GET_USERS_QUERY);
 
-  const [createUser, { data: newUser }] = useMutation(CREATE_USER);
+  // const [createUser, { data: newUser }] = useMutation(CREATE_USER);
 
   const onSubmit = async (data: any) => {
     const { profile_image, ...credentials } = data;
     setUploading(true);
     if (!profile_image || profile_image.length === 0) {
-      throw new Error("Select your profile image to upload");
+      throw new Error('Select your profile image to upload');
     }
     const file = profile_image[0];
-    const fileExt = file.name.split(".").pop();
+    const fileExt = file.name.split('.').pop();
     const filename = `${Date.now()}.${fileExt}`;
 
     try {
       let { data: imageData, error: uploadError } = await supabase.storage
-        .from("fanq-user-profiles")
+        .from('fanq-user-profiles')
         .upload(filename, file);
 
       if (uploadError) {
@@ -76,18 +75,33 @@ const Home: NextPage = () => {
       setUploading(false);
     }
 
-    await createUser({
-      variables: {
-        object: {
-          id: v4(),
-          username: credentials.email,
+    const { user, session, error } = await supabase.auth.signUp(
+      {
+        email: credentials.email,
+        password: credentials.password,
+      },
+      {
+        data: {
           first_name: credentials.firstname,
           last_name: credentials.lastname,
-          password: credentials.password,
-          profile: imageKey,
+          profile_image: credentials.profile_image,
         },
-      },
-    });
+      }
+    );
+
+    console.log('reg', { user, session, error });
+    // await createUser({
+    //   variables: {
+    //     object: {
+    //       id: v4(),
+    //       username: credentials.email,
+    //       first_name: credentials.firstname,
+    //       last_name: credentials.lastname,
+    //       password: credentials.password,
+    //       profile: imageKey,
+    //     },
+    //   },
+    // });
   };
 
   return (
@@ -104,10 +118,10 @@ const Home: NextPage = () => {
           Welcome to <a href="https://nextjs.org">FANQ</a>
         </h1>
 
-        <Flex justify={"center"}>
+        <Flex justify={'center'}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Flex
-              flexDirection={"column"}
+              flexDirection={'column'}
               gap="4"
               marginTop={10}
               maxWidth={400}
@@ -115,18 +129,18 @@ const Home: NextPage = () => {
               {/* register your input into the hook by invoking the "register" function */}
               <Input
                 placeholder="email"
-                {...register("email", { required: true })}
+                {...register('email', { required: true })}
               />
-              <Input placeholder="firstname" {...register("firstname")} />
-              <Input placeholder="lastname" {...register("lastname")} />
+              <Input placeholder="firstname" {...register('firstname')} />
+              <Input placeholder="lastname" {...register('lastname')} />
               {/* include validation with required or other standard HTML validation rules */}
               <Input
-                type={"password"}
+                type={'password'}
                 placeholder="password"
-                {...register("password", { required: true })}
+                {...register('password', { required: true })}
               />
               <Input
-                {...register("profile_image", { required: true })}
+                {...register('profile_image', { required: true })}
                 type="file"
               />
 
@@ -136,8 +150,8 @@ const Home: NextPage = () => {
               </Button>
               <Flex>
                 Already have an account?
-                <Text textDecoration={"underline"} paddingLeft="5px">
-                  <Link href={"/login"}> Login </Link>
+                <Text textDecoration={'underline'} paddingLeft="5px">
+                  <Link href={'/login'}> Login </Link>
                 </Text>
               </Flex>
             </Flex>
@@ -151,7 +165,7 @@ const Home: NextPage = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{" "}
+          Powered by{' '}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
