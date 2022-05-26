@@ -84,7 +84,7 @@ const Home: NextPage = () => {
         data: {
           first_name: credentials.firstname,
           last_name: credentials.lastname,
-          profile_image: credentials.profile_image,
+          profile_image: imageKey,
         },
       }
     );
