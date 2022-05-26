@@ -1,11 +1,24 @@
-import { Loading } from '@supabase/ui';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from '../styles/Home.module.css';
 import { supabase } from '../lib/supabaseClient';
+import { gql, useQuery } from '@apollo/client';
+
+const GET_USERS_QUERY = gql`
+  query getUsers {
+    users {
+      id
+      last_name
+      first_name
+      profile
+      updated_at
+      username
+    }
+  }
+`;
 
 const Home: NextPage = () => {
   const [uploading, setUploading] = useState(false);
@@ -15,6 +28,14 @@ const Home: NextPage = () => {
     watch,
     formState: { errors },
   } = useForm();
+
+  const { loading, error, data } = useQuery(GET_USERS_QUERY);
+
+  console.log({
+    loading,
+    data,
+    error,
+  });
 
   const onSubmit = async (data: any) => {
     const { profile_image, ...credentails } = data;

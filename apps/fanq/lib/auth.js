@@ -11,6 +11,8 @@ export const AuthProvider = ({ supabase, ...props }) => {
       value={{
         session,
         user,
+        setSession,
+        setUser,
         signOut: () => supabase.auth.signOut(),
       }}
       {...props}
