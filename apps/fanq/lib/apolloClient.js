@@ -16,8 +16,9 @@ const resetTokenLink = onError(({ networkError }) => {
 });
 
 const createHttpLink = (headers) => {
+  console.log(process.env.NEXT_PUBLIC_HASURA_API_URL)
   const httpLink = new HttpLink({
-    uri: process.env.APP_HOST,
+    uri: process.env.NEXT_PUBLIC_HASURA_API_URL,
     credentials: 'include',
     headers, // auth token is fetched on the server side
     fetch,

@@ -7,7 +7,10 @@ import { ApolloProvider } from '@apollo/client';
 
 const apolloClient = createApolloClient(
   {},
-  { 'x-hasura-admin-secret': process.env.NEXT_PUBLIC_HUSRA_ADMIN_SECRET }
+  {
+    'x-hasura-admin-secret': process.env.NEXT_PUBLIC_HUSRA_ADMIN_SECRET,
+    'Content-Type': 'application/json',
+  }
 );
 
 function MyApp({ Component, pageProps }: AppProps) {

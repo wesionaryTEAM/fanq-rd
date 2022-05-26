@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabaseClient';
 import { gql, useQuery } from '@apollo/client';
 
 const GET_USERS_QUERY = gql`
-  query getUsers {
+  query Users {
     users {
       id
       last_name
