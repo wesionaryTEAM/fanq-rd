@@ -7,7 +7,8 @@ import styles from "../styles/Home.module.css";
 import { supabase } from "../lib/supabaseClient";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { v4 } from "uuid";
-import { Button, Flex, FormControl, Input } from "@chakra-ui/react";
+import { Button, Flex, FormControl, Input, Text } from "@chakra-ui/react";
+import Link from "next/link";
 
 const GET_USERS_QUERY = gql`
   query Users {
@@ -104,7 +105,7 @@ const Home: NextPage = () => {
         </h1>
 
         <Flex justify={"center"}>
-          <FormControl onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Flex
               flexDirection={"column"}
               gap="4"
@@ -118,7 +119,6 @@ const Home: NextPage = () => {
               />
               <Input placeholder="firstname" {...register("firstname")} />
               <Input placeholder="lastname" {...register("lastname")} />
-
               {/* include validation with required or other standard HTML validation rules */}
               <Input
                 type={"password"}
@@ -130,14 +130,18 @@ const Home: NextPage = () => {
                 type="file"
               />
 
-              {/* errors will return when field validation fails  */}
               {errors && <span>Please fill in properly.</span>}
-
               <Button type="submit" isLoading={uploading} colorScheme="teal">
                 Register
               </Button>
+              <Flex>
+                Already have an account?
+                <Text textDecoration={"underline"} paddingLeft="5px">
+                  <Link href={"/login"}> Login </Link>
+                </Text>
+              </Flex>
             </Flex>
-          </FormControl>
+          </form>
         </Flex>
       </main>
 
