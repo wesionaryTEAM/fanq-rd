@@ -7,6 +7,7 @@ import styles from "../styles/Home.module.css";
 import { supabase } from "../lib/supabaseClient";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { v4 } from "uuid";
+import { Button, Flex, FormControl, Input } from "@chakra-ui/react";
 
 const GET_USERS_QUERY = gql`
   query Users {
@@ -47,12 +48,6 @@ const Home: NextPage = () => {
   const { loading, error, data } = useQuery(GET_USERS_QUERY);
 
   const [createUser, { data: newUser }] = useMutation(CREATE_USER);
-
-  console.log({
-    loading,
-    data,
-    error,
-  });
 
   const onSubmit = async (data: any) => {
     const { profile_image, ...credentials } = data;
@@ -108,32 +103,42 @@ const Home: NextPage = () => {
           Welcome to <a href="https://nextjs.org">FANQ</a>
         </h1>
 
-        <div className="form">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            {/* register your input into the hook by invoking the "register" function */}
-            <input
-              placeholder="email"
-              {...register("email", { required: true })}
-            />
-            <input placeholder="firstname" {...register("firstname")} />
-            <input placeholder="lastname" {...register("lastname")} />
+        <Flex justify={"center"}>
+          <FormControl onSubmit={handleSubmit(onSubmit)}>
+            <Flex
+              flexDirection={"column"}
+              gap="4"
+              marginTop={10}
+              maxWidth={400}
+            >
+              {/* register your input into the hook by invoking the "register" function */}
+              <Input
+                placeholder="email"
+                {...register("email", { required: true })}
+              />
+              <Input placeholder="firstname" {...register("firstname")} />
+              <Input placeholder="lastname" {...register("lastname")} />
 
-            {/* include validation with required or other standard HTML validation rules */}
-            <input
-              placeholder="password"
-              {...register("password", { required: true })}
-            />
-            <input
-              {...register("profile_image", { required: true })}
-              type="file"
-            />
+              {/* include validation with required or other standard HTML validation rules */}
+              <Input
+                type={"password"}
+                placeholder="password"
+                {...register("password", { required: true })}
+              />
+              <Input
+                {...register("profile_image", { required: true })}
+                type="file"
+              />
 
-            {/* errors will return when field validation fails  */}
-            {errors.exampleRequired && <span>This field is required</span>}
+              {/* errors will return when field validation fails  */}
+              {errors && <span>Please fill in properly.</span>}
 
-            <input type="submit" />
-          </form>
-        </div>
+              <Button type="submit" isLoading={uploading} colorScheme="teal">
+                Register
+              </Button>
+            </Flex>
+          </FormControl>
+        </Flex>
       </main>
 
       <footer className={styles.footer}>
