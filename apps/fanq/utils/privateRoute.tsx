@@ -14,18 +14,19 @@ const PrivateRoute = ({ children }: IPrivateRouteProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const publicRoutes = ['/login', '/'];
     try {
       setIsLoading(true);
       const session = supabase.auth.session();
       const user = supabase.auth.user();
-      if ((!user || !session) && router.pathname !== '/login') {
+      if ((!user || !session) && !publicRoutes.includes(router.pathname)) {
         router.replace('/login');
       }
     } catch (error) {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, router]);
+  }, [router]);
 
   return isLoading ? <div>Loading...</div> : children;
 };
