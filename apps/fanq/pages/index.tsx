@@ -4,6 +4,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { supabase } from '../lib/supabaseClient';
@@ -37,16 +38,14 @@ import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
   const [uploading, setUploading] = useState(false);
+
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
-
-  // const { loading, error, data } = useQuery(GET_USERS_QUERY);
-
-  // const [createUser, { data: newUser }] = useMutation(CREATE_USER);
 
   const onSubmit = async (data: any) => {
     const { profile_image, ...credentials } = data;
@@ -67,7 +66,7 @@ const Home: NextPage = () => {
         throw uploadError;
       }
 
-      const { user, session, error } = await supabase.auth.signUp(
+      await supabase.auth.signUp(
         {
           email: credentials.email,
           password: credentials.password,
@@ -80,6 +79,7 @@ const Home: NextPage = () => {
           },
         }
       );
+      router.push('/login');
     } catch (error) {
       throw error;
     } finally {
