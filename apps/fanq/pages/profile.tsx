@@ -1,8 +1,8 @@
-import { Avatar, Box, Button, Flex, Input, Text } from "@chakra-ui/react";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { supabase } from "../lib/supabaseClient";
+import { Avatar, Box, Button, Flex, Input, Text } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { supabase } from '../lib/supabaseClient';
 
 interface IEditForm {
   email: string;
@@ -34,16 +34,16 @@ const Profile = () => {
   const router = useRouter();
 
   const imageKey = user?.user_metadata?.profile_image?.split(
-    "fanq-user-profiles/"
+    'fanq-user-profiles/'
   )[1];
 
   const updateImage = async (profile_image: any) => {
     const file = profile_image[0];
-    const fileExt = file.name.split(".").pop();
+    const fileExt = file.name.split('.').pop();
     const filename = `${Date.now()}.${fileExt}`;
 
     let { error: deleteError } = await supabase.storage
-      .from("fanq-user-profiles")
+      .from('fanq-user-profiles')
       .remove([imageKey]);
 
     if (deleteError) {
@@ -51,7 +51,7 @@ const Profile = () => {
     }
 
     let { data: newImage, error: uploadError } = await supabase.storage
-      .from("fanq-user-profiles")
+      .from('fanq-user-profiles')
       .upload(filename, file);
 
     if (uploadError) {
@@ -63,20 +63,19 @@ const Profile = () => {
   const editUser = async (data: any) => {
     const { profile_image, ...credentials } = data;
 
-    console.info("CREDDD", credentials);
-
     try {
-      const { data: updated_user, error } = await supabase.auth.update({
+      const payload: any = {
         email: credentials?.email,
         data: {
-          first_name: credentials?.firstname,
+          first_name: credentials?.first_name,
           profile_image:
-            typeof profile_image == "object"
-              ? updateImage(profile_image)
-              : imageKey,
+            typeof profile_image === 'object'
+              ? await updateImage(profile_image)
+              : user?.user_metadata?.profile_image,
         },
-      });
-      console.log("UPDATED USER", updated_user);
+      };
+
+      const { data: updated_user, error } = await supabase.auth.update(payload);
     } catch (error) {}
   };
 
@@ -86,39 +85,39 @@ const Profile = () => {
         <button
           onClick={() => {
             supabase.auth.signOut();
-            router.push("/");
+            router.push('/');
           }}
         >
           Sign Out
         </button>
         {isEditMode ? (
-          <Flex justify={"center"}>
+          <Flex justify={'center'}>
             <form onSubmit={handleSubmit(editUser)}>
               <Flex
-                flexDirection={"column"}
+                flexDirection={'column'}
                 gap="4"
                 marginTop={10}
                 maxWidth={400}
               >
-                <Flex justify={"center"}>
+                <Flex justify={'center'}>
                   <Avatar
                     marginRight={4}
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_URL}/${user?.user_metadata.profile_image}`}
                   />
-                  <Input {...register("profile_image")} type="file" />
+                  <Input {...register('profile_image')} type="file" />
                 </Flex>
                 {/* register your input into the hook by invoking the "register" function */}
                 <Input
                   placeholder="email"
-                  {...register("email", { required: true })}
+                  {...register('email', { required: true })}
                 />
-                <Input placeholder="first name" {...register("first_name")} />
-                <Input placeholder="last name" {...register("last_name")} />
+                <Input placeholder="first name" {...register('first_name')} />
+                <Input placeholder="last name" {...register('last_name')} />
                 {/* include validation with required or other standard HTML validation rules */}
                 <Input
-                  type={"password"}
+                  type={'password'}
                   placeholder="password"
-                  {...register("password")}
+                  {...register('password')}
                 />
 
                 {errors && <span>Please fill in properly.</span>}
@@ -136,11 +135,11 @@ const Profile = () => {
             </form>
           </Flex>
         ) : (
-          <Flex justifyContent={"center"} width="100%">
+          <Flex justifyContent={'center'} width="100%">
             <Box
-              display={"flex"}
-              flexDirection={"column"}
-              alignItems={"center"}
+              display={'flex'}
+              flexDirection={'column'}
+              alignItems={'center'}
               gap={5}
             >
               <Avatar
@@ -150,8 +149,8 @@ const Profile = () => {
                 <span>Email: </span> <Text marginLeft={2}>{user?.email}</Text>
               </Flex>
               <Flex>
-                <span>Username: </span>{" "}
-                <Text marginLeft={2}>{user?.user_metadata?.first_name}</Text>{" "}
+                <span>Username: </span>{' '}
+                <Text marginLeft={2}>{user?.user_metadata?.first_name}</Text>{' '}
                 <Text marginLeft={1}>{user?.user_metadata?.last_name}</Text>
               </Flex>
             </Box>
