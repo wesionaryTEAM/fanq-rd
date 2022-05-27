@@ -1,7 +1,15 @@
-import React from "react";
-import { supabase } from "../lib/supabaseClient";
+import { useRouter } from 'next/router';
+import React from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Profile({ session }: any) {
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    supabase.auth.signOut();
+    router.replace('/login');
+  };
+
   return (
     <div className="form-widget">
       <div>
@@ -10,10 +18,7 @@ export default function Profile({ session }: any) {
       </div>
 
       <div>
-        <button
-          className="button block"
-          onClick={() => supabase.auth.signOut()}
-        >
+        <button className="button block" onClick={handleSignOut}>
           Sign Out
         </button>
       </div>

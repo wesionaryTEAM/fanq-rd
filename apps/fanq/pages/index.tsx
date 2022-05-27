@@ -80,8 +80,6 @@ const Home: NextPage = () => {
           },
         }
       );
-
-      console.log('reg', { user, session, error });
     } catch (error) {
       throw error;
     } finally {
