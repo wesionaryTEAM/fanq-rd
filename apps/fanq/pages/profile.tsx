@@ -14,7 +14,6 @@ interface IEditForm {
 
 const Profile = () => {
   const user = supabase.auth.user();
-  console.log("USER", user);
 
   const {
     register,
@@ -46,17 +45,12 @@ const Profile = () => {
         "fanq-user-profiles/"
       )[1];
 
-      let { error: deleteError } = await supabase.storage
-        .from("fanq-user-profiles")
-        .remove([imageKey]);
-
-      if (deleteError) {
-        throw deleteError;
-      }
-
       let { data: newImage, error: uploadError } = await supabase.storage
         .from("fanq-user-profiles")
-        .upload(filename, file);
+        .update(imageKey, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (uploadError) {
         throw uploadError;
@@ -70,7 +64,10 @@ const Profile = () => {
             profile_image: newImage ? newImage.Key : imageKey,
           },
         });
-      } catch (error) {}
+        console.log("UPDATED USER", updated_user);
+      } catch (error) {
+        console.error("ERRO UPDATE USER", error);
+      }
     }
   };
 
