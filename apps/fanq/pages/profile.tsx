@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "../lib/supabaseClient";
 
-
 interface IEditForm {
   email: string;
   first_name: string;
@@ -12,7 +11,6 @@ interface IEditForm {
   profile_image: string;
   password?: string;
 }
-
 
 const Profile = () => {
   const user = supabase.auth.user();
@@ -30,7 +28,6 @@ const Profile = () => {
       profile_image: user?.user_metadata?.profile_image,
     },
   });
-  console.log("ERROEAS", errors);
 
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,17 +37,41 @@ const Profile = () => {
   const editUser = async (data: any) => {
     const { profile_image, ...credentials } = data;
 
-    console.info("FROM EDIT USER", profile_image, credentials);
+    if (typeof profile_image == "object") {
+      const file = profile_image[0];
+      const fileExt = file.name.split(".").pop();
+      const filename = `${Date.now()}.${fileExt}`;
 
-    try {
-      const { user, error } = await supabase.auth.update({
-        email: credentials?.email,
-        data: {
-          first_name: credentials?.firstname,
-        },
-      });
-      console.info("FROM EDIT TRY CATCH", user, error);
-    } catch (error) {}
+      const imageKey = user?.user_metadata?.profile_image?.split(
+        "fanq-user-profiles/"
+      )[1];
+
+      let { error: deleteError } = await supabase.storage
+        .from("fanq-user-profiles")
+        .remove([imageKey]);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      let { data: newImage, error: uploadError } = await supabase.storage
+        .from("fanq-user-profiles")
+        .upload(filename, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      try {
+        const { data: updated_user, error } = await supabase.auth.update({
+          email: credentials?.email,
+          data: {
+            first_name: credentials?.firstname,
+            profile_image: newImage ? newImage.Key : imageKey,
+          },
+        });
+      } catch (error) {}
+    }
   };
 
   return (
