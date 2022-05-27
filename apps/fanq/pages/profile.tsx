@@ -33,42 +33,51 @@ const Profile = () => {
 
   const router = useRouter();
 
+  const imageKey = user?.user_metadata?.profile_image?.split(
+    "fanq-user-profiles/"
+  )[1];
+
+  const updateImage = async (profile_image: any) => {
+    const file = profile_image[0];
+    const fileExt = file.name.split(".").pop();
+    const filename = `${Date.now()}.${fileExt}`;
+
+    let { error: deleteError } = await supabase.storage
+      .from("fanq-user-profiles")
+      .remove([imageKey]);
+
+    if (deleteError) {
+      throw deleteError;
+    }
+
+    let { data: newImage, error: uploadError } = await supabase.storage
+      .from("fanq-user-profiles")
+      .upload(filename, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+    return newImage?.Key;
+  };
+
   const editUser = async (data: any) => {
     const { profile_image, ...credentials } = data;
 
-    if (typeof profile_image == "object") {
-      const file = profile_image[0];
-      const fileExt = file.name.split(".").pop();
-      const filename = `${Date.now()}.${fileExt}`;
+    console.info("CREDDD", credentials);
 
-      const imageKey = user?.user_metadata?.profile_image?.split(
-        "fanq-user-profiles/"
-      )[1];
-
-      let { data: newImage, error: uploadError } = await supabase.storage
-        .from("fanq-user-profiles")
-        .update(imageKey, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      try {
-        const { data: updated_user, error } = await supabase.auth.update({
-          email: credentials?.email,
-          data: {
-            first_name: credentials?.firstname,
-            profile_image: newImage ? newImage.Key : imageKey,
-          },
-        });
-        console.log("UPDATED USER", updated_user);
-      } catch (error) {
-        console.error("ERRO UPDATE USER", error);
-      }
-    }
+    try {
+      const { data: updated_user, error } = await supabase.auth.update({
+        email: credentials?.email,
+        data: {
+          first_name: credentials?.firstname,
+          profile_image:
+            typeof profile_image == "object"
+              ? updateImage(profile_image)
+              : imageKey,
+        },
+      });
+      console.log("UPDATED USER", updated_user);
+    } catch (error) {}
   };
 
   return (
