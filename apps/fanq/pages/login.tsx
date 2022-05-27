@@ -1,12 +1,12 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import styles from "../styles/Home.module.css";
-import { supabase } from "../lib/supabaseClient";
-import { Button, Flex, Input } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import Image from 'next/image';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import styles from '../styles/Home.module.css';
+import { supabase } from '../lib/supabaseClient';
+import { Button, Flex, Input, useToast } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 
 const Login: NextPage = () => {
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,8 @@ const Login: NextPage = () => {
 
   const router = useRouter();
 
+  const toast = useToast();
+
   const handleLogin = async (data: any) => {
     try {
       setLoading(true);
@@ -26,9 +28,14 @@ const Login: NextPage = () => {
         password: data?.password,
       });
       if (error) throw error;
-      router.push("/profile");
+      router.push('/profile');
     } catch (error) {
-      alert(error);
+      toast({
+        title: 'Login failed',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -48,10 +55,10 @@ const Login: NextPage = () => {
           <a href="https://nextjs.org">LOGIN</a>
         </h1>
 
-        <Flex justify={"center"}>
+        <Flex justify={'center'}>
           <form onSubmit={handleSubmit(handleLogin)}>
             <Flex
-              flexDirection={"column"}
+              flexDirection={'column'}
               gap="4"
               marginTop={10}
               maxWidth={400}
@@ -59,14 +66,14 @@ const Login: NextPage = () => {
               {/* register your input into the hook by invoking the "register" function */}
               <Input
                 placeholder="email"
-                {...register("email", { required: true })}
+                {...register('email', { required: true })}
               />
               {errors.email && <span>Email is required</span>}
 
               <Input
-                type={"password"}
+                type={'password'}
                 placeholder="password"
-                {...register("password", { required: true })}
+                {...register('password', { required: true })}
               />
               {errors.password && <span>Password is required</span>}
 
@@ -84,7 +91,7 @@ const Login: NextPage = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{" "}
+          Powered by{' '}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>

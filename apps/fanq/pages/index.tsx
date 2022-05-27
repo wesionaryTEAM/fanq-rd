@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client';
-import { Button, Flex, Input, Text } from '@chakra-ui/react';
+import { Button, Flex, Input, Text, useToast } from '@chakra-ui/react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -40,6 +40,7 @@ const Home: NextPage = () => {
   const [uploading, setUploading] = useState(false);
 
   const router = useRouter();
+  const toast = useToast();
 
   const {
     register,
@@ -81,7 +82,12 @@ const Home: NextPage = () => {
       );
       router.push('/login');
     } catch (error) {
-      throw error;
+      toast({
+        title: 'Registration failed',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
     } finally {
       setUploading(false);
     }
