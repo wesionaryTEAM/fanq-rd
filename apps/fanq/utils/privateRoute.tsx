@@ -11,6 +11,7 @@ interface IPrivateRouteProps {
 
 const PrivateRoute = ({ children }: IPrivateRouteProps) => {
   const router = useRouter();
+  const [hasAccess, setHasAccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,8 +20,13 @@ const PrivateRoute = ({ children }: IPrivateRouteProps) => {
       setIsLoading(true);
       const session = supabase.auth.session();
       const user = supabase.auth.user();
+
       if ((!user || !session) && !publicRoutes.includes(router.pathname)) {
         router.replace('/login');
+      } else if ((user || session) && publicRoutes.includes(router.pathname)) {
+        router.replace('/profile');
+      } else {
+        setHasAccess(true);
       }
     } catch (error) {
     } finally {
@@ -28,7 +34,7 @@ const PrivateRoute = ({ children }: IPrivateRouteProps) => {
     }
   }, [router]);
 
-  return isLoading ? <div>Loading...</div> : children;
+  return isLoading || !hasAccess ? <div>Loading...</div> : children;
 };
 
 export default PrivateRoute;
