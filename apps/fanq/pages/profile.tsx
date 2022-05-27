@@ -72,11 +72,15 @@ const Profile = () => {
             typeof profile_image === 'object'
               ? await updateImage(profile_image)
               : user?.user_metadata?.profile_image,
+          last_name: credentials?.last_name,
         },
       };
 
-      const { data: updated_user, error } = await supabase.auth.update(payload);
-    } catch (error) {}
+      await supabase.auth.update(payload);
+      setIsEditMode(false);
+    } catch (error) {
+      console.error('UPDATE USER ERROR:', error);
+    }
   };
 
   return (
