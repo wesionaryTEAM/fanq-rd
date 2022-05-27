@@ -10,7 +10,7 @@ interface IEditForm {
   first_name: string;
   last_name: string;
   profile_image: string;
-  password?: "123456";
+  password?: string;
 }
 
 
