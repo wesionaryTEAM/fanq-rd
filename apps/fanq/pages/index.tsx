@@ -9,18 +9,18 @@ import { useForm } from 'react-hook-form';
 import { supabase } from '../lib/supabaseClient';
 import styles from '../styles/Home.module.css';
 
-const GET_USERS_QUERY = gql`
-  query Users {
-    users {
-      id
-      last_name
-      first_name
-      profile
-      updated_at
-      username
-    }
-  }
-`;
+// const GET_USERS_QUERY = gql`
+//   query Users {
+//     users {
+//       id
+//       last_name
+//       first_name
+//       profile
+//       updated_at
+//       username
+//     }
+//   }
+// `;
 
 // const CREATE_USER = gql`
 //   mutation ($object: users_insert_input!) {
@@ -37,7 +37,6 @@ const GET_USERS_QUERY = gql`
 
 const Home: NextPage = () => {
   const [uploading, setUploading] = useState(false);
-  const [imageKey, setImageKey] = useState<string | undefined>();
   const {
     register,
     handleSubmit,
@@ -45,7 +44,7 @@ const Home: NextPage = () => {
     formState: { errors },
   } = useForm();
 
-  const { loading, error, data } = useQuery(GET_USERS_QUERY);
+  // const { loading, error, data } = useQuery(GET_USERS_QUERY);
 
   // const [createUser, { data: newUser }] = useMutation(CREATE_USER);
 
@@ -68,28 +67,27 @@ const Home: NextPage = () => {
         throw uploadError;
       }
 
-      setImageKey(imageData?.Key);
+      const { user, session, error } = await supabase.auth.signUp(
+        {
+          email: credentials.email,
+          password: credentials.password,
+        },
+        {
+          data: {
+            first_name: credentials.firstname,
+            last_name: credentials.lastname,
+            profile_image: imageData?.Key,
+          },
+        }
+      );
+
+      console.log('reg', { user, session, error });
     } catch (error) {
       throw error;
     } finally {
       setUploading(false);
     }
 
-    const { user, session, error } = await supabase.auth.signUp(
-      {
-        email: credentials.email,
-        password: credentials.password,
-      },
-      {
-        data: {
-          first_name: credentials.firstname,
-          last_name: credentials.lastname,
-          profile_image: imageKey,
-        },
-      }
-    );
-
-    console.log('reg', { user, session, error });
     // await createUser({
     //   variables: {
     //     object: {
