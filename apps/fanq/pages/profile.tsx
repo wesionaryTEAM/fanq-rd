@@ -1,4 +1,13 @@
-import { Avatar, Box, Button, Flex, Input, Text } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  Button,
+  Flex,
+  Input,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -14,6 +23,8 @@ interface IEditForm {
 
 const Profile = () => {
   const user = supabase.auth.user();
+
+  const toast = useToast();
 
   const {
     register,
@@ -83,6 +94,17 @@ const Profile = () => {
     }
   };
 
+  const resetPassword = async () => {
+    await supabase.auth.api.resetPasswordForEmail(user?.email as string);
+    toast({
+      title: 'Password Rest',
+      description: "We've sent password reset link in your email.",
+      status: 'info',
+      duration: 9000,
+      isClosable: true,
+    });
+  };
+
   return (
     <div>
       <div>
@@ -123,6 +145,11 @@ const Profile = () => {
                   placeholder="password"
                   {...register('password')}
                 />
+                <Flex justifyContent={'flex-end'}>
+                  <Text cursor={'pointer'} as="u" onClick={resetPassword}>
+                    Reset Password
+                  </Text>
+                </Flex>
 
                 {errors && <span>Please fill in properly.</span>}
                 <Button type="submit" isLoading={loading} colorScheme="teal">
