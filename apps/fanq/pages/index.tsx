@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client';
+// import { gql, useQuery } from '@apollo/client';
 import { Button, Flex, Input, Text, useToast } from '@chakra-ui/react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -9,6 +9,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { supabase } from '../lib/supabaseClient';
 import styles from '../styles/Home.module.css';
+import * as zod from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 // const GET_USERS_QUERY = gql`
 //   query Users {
@@ -36,6 +38,19 @@ import styles from '../styles/Home.module.css';
 //   }
 // `;
 
+const schema = zod.object({
+  email: zod
+    .string({ required_error: 'Email is required' })
+    .email({ message: 'Must be a valid email' })
+    .trim(),
+  firstname: zod
+    .string()
+    .nonempty({ message: 'First name is required' })
+    .trim(),
+  lastname: zod.string().nonempty({ message: 'Last name is required' }).trim(),
+  password: zod.string().nonempty({ message: 'Password is required' }).trim(),
+});
+
 const Home: NextPage = () => {
   const [uploading, setUploading] = useState(false);
 
@@ -46,14 +61,22 @@ const Home: NextPage = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
 
   const onSubmit = async (data: any) => {
     const { profile_image, ...credentials } = data;
     setUploading(true);
-    if (!profile_image || profile_image.length === 0) {
-      throw new Error('Select your profile image to upload');
-    }
+    // if (!profile_image || profile_image.length === 0) {
+    //   toast({
+    //     title: 'Select your profile image to upload',
+    //     status: 'info',
+    //     duration: 9000,
+    //     isClosable: true,
+    //   });
+    //   throw new Error('Select your profile image to upload');
+    // }
     const file = profile_image[0];
     const fileExt = file.name.split('.').pop();
     const filename = `${Date.now()}.${fileExt}`;
@@ -106,6 +129,10 @@ const Home: NextPage = () => {
     // });
   };
 
+  {
+    console.info('ERRORES', errors);
+  }
+
   return (
     <div className={styles.container}>
       {uploading ? <>Loading...</> : null}
@@ -129,24 +156,27 @@ const Home: NextPage = () => {
               maxWidth={400}
             >
               {/* register your input into the hook by invoking the "register" function */}
-              <Input
-                placeholder="email"
-                {...register('email', { required: true })}
-              />
+              <Input placeholder="email" {...register('email')} />
+              {errors.email?.message && <p>{errors.email?.message}</p>}
+
               <Input placeholder="firstname" {...register('firstname')} />
+              {errors.firstname?.message && <p>{errors.firstname?.message}</p>}
+
               <Input placeholder="lastname" {...register('lastname')} />
+              {errors.lastname?.message && <p>{errors.lastname?.message}</p>}
               {/* include validation with required or other standard HTML validation rules */}
               <Input
                 type={'password'}
                 placeholder="password"
                 {...register('password', { required: true })}
               />
+              {errors.password?.message && <p>{errors.password?.message}</p>}
+
               <Input
                 {...register('profile_image', { required: true })}
                 type="file"
               />
 
-              {errors && <span>Please fill in properly.</span>}
               <Button type="submit" isLoading={uploading} colorScheme="teal">
                 Register
               </Button>

@@ -13,6 +13,7 @@
     "@chakra-ui/react": "^2.1.2",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@hookform/resolvers": "^2.8.10",
     "@supabase/supabase-js": "^1.35.3",
     "@supabase/ui": "^0.36.5",
     "@types/uuid": "^8.3.4",
